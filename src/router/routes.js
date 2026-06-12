@@ -5,7 +5,12 @@ const routes = [
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
       { path: 'second', component: () => import('@/pages/SecondPage.vue') },
+      { path: 'third', component: () => import('@/pages/TestPage.vue') },
     ],
+  },
+  {
+    path: '/login',
+    component: () => import('@/components/auth/LoginForm.vue'),
   },
 
   // Always leave this as last one,

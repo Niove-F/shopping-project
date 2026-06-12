@@ -4,35 +4,34 @@ import pluginVue from 'eslint-plugin-vue'
 import pluginQuasar from '@quasar/app-vite/eslint'
 import prettierSkipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 
+import tseslint from 'typescript-eslint'
+import vueParser from 'vue-eslint-parser'
+
 export default [
   {
-    /**
-     * Ignore the following files.
-     * Please note that pluginQuasar.configs.recommended() already ignores
-     * the "node_modules" folder for you (and all other Quasar project
-     * relevant folders and files).
-     *
-     * ESLint requires "ignores" key to be the only one in this object
-     */
     // ignores: []
   },
 
   ...pluginQuasar.configs.recommended(),
   js.configs.recommended,
 
-  /**
-   * https://eslint.vuejs.org
-   *
-   * pluginVue.configs.base
-   *   -> Settings and rules to enable correct ESLint parsing.
-   * pluginVue.configs[ 'flat/essential']
-   *   -> base, plus rules to prevent errors or unintended behavior.
-   * pluginVue.configs["flat/strongly-recommended"]
-   *   -> Above, plus rules to considerably improve code readability and/or dev experience.
-   * pluginVue.configs["flat/recommended"]
-   *   -> Above, plus rules to enforce subjective community defaults to ensure consistency.
-   */
+  // 2. Agregamos las configuraciones recomendadas de TypeScript
+  ...tseslint.configs.recommended,
+
   ...pluginVue.configs['flat/essential'],
+
+  {
+    // 3. Aplicamos el parser correcto para archivos Vue y TypeScript
+    files: ['**/*.ts', '**/*.vue'],
+    languageOptions: {
+      parser: vueParser,
+      parserOptions: {
+        parser: tseslint.parser,
+        sourceType: 'module',
+        ecmaVersion: 'latest',
+      },
+    },
+  },
 
   {
     languageOptions: {
@@ -41,22 +40,22 @@ export default [
 
       globals: {
         ...globals.browser,
-        ...globals.node, // SSR, Electron, config files
-        process: 'readonly', // process.env.*
-        ga: 'readonly', // Google Analytics
+        ...globals.node,
+        process: 'readonly',
+        ga: 'readonly',
         cordova: 'readonly',
         Capacitor: 'readonly',
-        chrome: 'readonly', // BEX related
-        browser: 'readonly', // BEX related
+        chrome: 'readonly',
+        browser: 'readonly',
       },
     },
 
     // add your custom rules here
     rules: {
       'prefer-promise-reject-errors': 'off',
-
-      // allow debugger during development only
       'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+      // Opcional: Desactivar una regla molesta de TS si usas tipados simples en métodos
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 
